@@ -1,5 +1,12 @@
 {
   "name": "auto-def",
   "main": "index.js",
-  "compatibility_date": "2026-02-12"
+  "compatibility_date": "2026-02-12",
+
+  "kv_namespaces": [
+    {
+      "binding": "COMMAND_STORE",
+      "id": "c39d89ceac874e0b809a79bf1697d778"
+    }
+  ]
 }
