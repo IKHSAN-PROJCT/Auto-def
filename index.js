@@ -1,18 +1,25 @@
-let storedData = "idle";
+let command = "none";
 
 export default {
   async fetch(request) {
 
-    if (request.method === "POST") {
-      let text = await request.text();
-      storedData = text.toLowerCase();
-      return new Response("OK");
+    const url = new URL(request.url);
+
+    // SET COMMAND
+    if (url.pathname === "/set" && request.method === "POST") {
+
+      const body = await request.text();
+      command = body.trim();
+
+      return new Response("SET: " + command);
     }
 
-    if (request.method === "GET") {
-      return new Response(storedData);
+    // GET COMMAND
+    if (url.pathname === "/get" && request.method === "GET") {
+
+      return new Response(command);
     }
 
-    return new Response("Not allowed");
+    return new Response("Invalid route");
   }
-  }
+}
