@@ -1,45 +1,45 @@
 export default {
   async fetch(request, env) {
-
-    const url = new URL(request.url);
+    const url = new URL(request.url)
 
     // =========================
-    // SET COMMAND (POST)
+    // SET COMMAND
     // =========================
-    if (request.method === "POST" && url.pathname === "/set") {
+    if (url.pathname === "/set" && request.method === "POST") {
+      try {
+        const body = await request.json()
+        const cmd = body.cmd
 
-      const body = await request.text();
-
-      // body contoh: cmd=flash_on
-      const cmd = body.replace("cmd=", "").trim();
-
-      if (!cmd) {
-        return new Response("Empty command");
-      }
-
-      await env.COMMAND_STORE.put("cmd", cmd);
-
-      return new Response("OK", {
-        headers: {
-          "Cache-Control": "no-store"
+        if (!cmd) {
+          return new Response("Command kosong", { status: 400 })
         }
-      });
+
+        await env.COMMAND_STORE.put("last_command", cmd)
+
+        return new Response(
+          JSON.stringify({ status: "success", cmd }),
+          { headers: { "Content-Type": "application/json" } }
+        )
+      } catch (err) {
+        return new Response("Error parsing JSON", { status: 400 })
+      }
     }
 
     // =========================
     // GET COMMAND
     // =========================
-    if (request.method === "GET" && url.pathname === "/get") {
+    if (url.pathname === "/get" && request.method === "GET") {
+      const cmd = await env.COMMAND_STORE.get("last_command")
 
-      const cmd = await env.COMMAND_STORE.get("cmd");
-
-      return new Response(cmd || "none", {
-        headers: {
-          "Cache-Control": "no-store"
-        }
-      });
+      return new Response(
+        JSON.stringify({ cmd: cmd || null }),
+        { headers: { "Content-Type": "application/json" } }
+      )
     }
 
-    return new Response("Invalid route", { status: 404 });
+    // =========================
+    // DEFAULT
+    // =========================
+    return new Response("Worker aktif 🚀", { status: 200 })
   }
 }
