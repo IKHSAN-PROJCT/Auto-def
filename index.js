@@ -5,21 +5,20 @@ export default {
 
     const url = new URL(request.url);
 
-    // SET COMMAND
-    if (url.pathname === "/set" && request.method === "POST") {
-
-      const body = await request.text();
-      command = body.trim();
-
-      return new Response("SET: " + command);
+    if (request.method === "POST" && url.pathname === "/set") {
+      const formData = await request.text();
+      command = formData.replace("cmd=", "");
+      return new Response("OK");
     }
 
-    // GET COMMAND
-    if (url.pathname === "/get" && request.method === "GET") {
-
-      return new Response(command);
+    if (url.pathname === "/get") {
+      return new Response(command, {
+        headers: {
+          "Cache-Control": "no-store"
+        }
+      });
     }
 
-    return new Response("Invalid route");
+    return new Response("Invalid");
   }
 }
